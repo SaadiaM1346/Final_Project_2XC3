@@ -36,7 +36,6 @@ class Graph:
     def number_of_nodes(self):
         return len(self.adj)
 
-
 # Helper Class for Heap
 class Item:
     def __init__(self, value, key):
@@ -46,7 +45,7 @@ class Item:
     def __str__(self):
         return "(" + str(self.key) + "," + str(self.value) + ")"
 
-# Min Heap Class
+# Min Heap Class for Dijkstra
 class Heap:
     def __init__(self, data):
         self.items = data
@@ -160,64 +159,15 @@ class Heap:
             whitespace = whitespace // 2
         return s
 
-# Random graph generator for 2.3
-def create_random_graph_dijkstra(nodes, edges):
-    graph = Graph(nodes)
-    added_edges = set()
-
-    # create a spanning tree
-    for i in range(1, nodes):
-        node1 = i
-        node2 = random.randint(0, i - 1)  # connect node to any previously added node
-        weight = random.randint(1, 10)
-        graph.add_edge(node1, node2, weight)
-        added_edges.add((node1, node2))
-
-    # add any random edges
-    while len(added_edges) < edges:
-        node1 = random.randint(0, nodes - 1)
-        node2 = random.randint(0, nodes - 1)
-
-        # ensure no self-loops + no duplicate edges
-        if node1 != node2 and (node1, node2) not in added_edges and (node2, node1) not in added_edges:
-            weight = random.randint(1, 10)  # adjust weight range as needed
-            graph.add_edge(node1, node2, weight)
-            added_edges.add((node1, node2))
-
-    return graph
-
-def create_random_graph_bellman(nodes, edges):
-    graph = Graph(nodes)
-    added_edges = set()
-
-    # create a spanning tree
-    for i in range(1, nodes):
-        node1 = i
-        node2 = random.randint(0, i - 1)  # connect node to any previously added node
-        weight = random.randint(1, 10)
-        graph.add_edge(node1, node2, weight)
-        added_edges.add((node1, node2))
-
-    # add any random edges
-    while len(added_edges) < edges:
-        node1 = random.randint(0, nodes - 1)
-        node2 = random.randint(0, nodes - 1)
-
-        # ensure no self-loops + no duplicate edges
-        if node1 != node2 and (node1, node2) not in added_edges and (node2, node1) not in added_edges:
-            weight = random.randint(1, 10)  # adjust weight range as needed
-            graph.add_edge(node1, node2, weight)
-            added_edges.add((node1, node2))
-
-    return graph
-
-create_random_graph_bellman(10,10)
+class Queue:
+    def __init__(self):
+        self.q = []
 
 def dijkstra(graph, source, k):
 
-    dist = {}
-    path = {}
+    dist, path = {}, {}
     relax_count = {}
+    items = []
 
     #includes the shortest distance and path 
     shortest_paths = {}
@@ -226,15 +176,28 @@ def dijkstra(graph, source, k):
         return {}
 
     for node in graph: 
-        dist[node] = float('inf')
+        dist[node] = float('inf') 
         path[node] = []
         relax_count[node] = 0
+        #Adding each node and its distance to a list
+        items.append(Item(dist[node], node))
+
+    #Creating a min heap from the list 
+    min_heap = Heap(items)
+
+    #Initializing the source key distance to 0 and adding it to heap
     dist[source] = 0
+    min_heap.decrease_key(source, 0)
+    
+    while not min_heap.is_empty():
+        #find ndoe with min distance 
+        return 
+
 
     return shortest_paths
 
-
 def bellman_ford(graph, source, k):
+
     return
 
 def part2_experiment():
