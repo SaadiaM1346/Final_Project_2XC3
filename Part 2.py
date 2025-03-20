@@ -5,50 +5,37 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-# Undirected Weighted Graph
-class Graph():
-    def __init__(self, nodes):
-        self.graph = {}
-        self.weight = {}
-        for i in range(nodes):
-            self.graph[i] = []
+# Directed Weighted Graph
+class Graph:
+
+    def __init__(self):
+        self.adj = {}
+        self.weights = {}
 
     def are_connected(self, node1, node2):
-        for node in self.adj[node1]:
-            if node == node2:
+        for neighbour in self.adj[node1]:
+            if neighbour == node2:
                 return True
         return False
 
-    def connected_nodes(self, node):
-        return self.graph[node]
+    def adjacent_nodes(self, node):
+        return self.adj[node]
 
-    def add_node(self, ):
-        # add a new node number = length of existing node
-        self.graph[len(self.graph)] = []
+    def add_node(self, node):
+        self.adj[node] = []
 
     def add_edge(self, node1, node2, weight):
-        if node1 not in self.graph[node2]:
-            self.graph[node1].append(node2)
-            self.weight[(node1, node2)] = weight
+        if node2 not in self.adj[node1]:
+            self.adj[node1].append(node2)
+        self.weights[(node1, node2)] = weight
 
-            # since it is undirected
-            self.graph[node2].append(node1)
-            self.weight[(node2, node1)] = weight
+    def w(self, node1, node2):
+        if self.are_connected(node1, node2):
+            return self.weights[(node1, node2)]
 
-    def number_of_nodes(self, ):
-        return len(self.graph)
+    def number_of_nodes(self):
+        return len(self.adj)
 
-    def has_edge(self, src, dst):
-        return dst in self.graph[src]
-
-    def get_weight(self, ):
-        total = 0
-        for node1 in self.graph:
-            for node2 in self.graph[node1]:
-                total += self.weight[(node1, node2)]
-
-        # because it is undirected
-        return total / 2
 
 # Helper Class for Heap
 class Item:
@@ -174,7 +161,7 @@ class Heap:
         return s
 
 # Random graph generator for 2.3
-def create_random_graph(nodes, edges):
+def create_random_graph_dijkstra(nodes, edges):
     graph = Graph(nodes)
     added_edges = set()
 
@@ -198,3 +185,58 @@ def create_random_graph(nodes, edges):
             added_edges.add((node1, node2))
 
     return graph
+
+def create_random_graph_bellman(nodes, edges):
+    graph = Graph(nodes)
+    added_edges = set()
+
+    # create a spanning tree
+    for i in range(1, nodes):
+        node1 = i
+        node2 = random.randint(0, i - 1)  # connect node to any previously added node
+        weight = random.randint(1, 10)
+        graph.add_edge(node1, node2, weight)
+        added_edges.add((node1, node2))
+
+    # add any random edges
+    while len(added_edges) < edges:
+        node1 = random.randint(0, nodes - 1)
+        node2 = random.randint(0, nodes - 1)
+
+        # ensure no self-loops + no duplicate edges
+        if node1 != node2 and (node1, node2) not in added_edges and (node2, node1) not in added_edges:
+            weight = random.randint(1, 10)  # adjust weight range as needed
+            graph.add_edge(node1, node2, weight)
+            added_edges.add((node1, node2))
+
+    return graph
+
+create_random_graph_bellman(10,10)
+
+def dijkstra(graph, source, k):
+
+    dist = {}
+    path = {}
+    relax_count = {}
+
+    #includes the shortest distance and path 
+    shortest_paths = {}
+
+    if source not in graph:
+        return {}
+
+    for node in graph: 
+        dist[node] = float('inf')
+        path[node] = []
+        relax_count[node] = 0
+    dist[source] = 0
+
+    return shortest_paths
+
+
+def bellman_ford(graph, source, k):
+    return
+
+def part2_experiment():
+    return
+
