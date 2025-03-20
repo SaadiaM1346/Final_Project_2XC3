@@ -1,3 +1,10 @@
+import random
+import time
+import timeit 
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+
 # Undirected Weighted Graph
 class Graph():
     def __init__(self, nodes):
@@ -165,3 +172,29 @@ class Heap:
             s += "\n"
             whitespace = whitespace // 2
         return s
+
+# Random graph generator for 2.3
+def create_random_graph(nodes, edges):
+    graph = Graph(nodes)
+    added_edges = set()
+
+    # create a spanning tree
+    for i in range(1, nodes):
+        node1 = i
+        node2 = random.randint(0, i - 1)  # connect node to any previously added node
+        weight = random.randint(1, 10)
+        graph.add_edge(node1, node2, weight)
+        added_edges.add((node1, node2))
+
+    # add any random edges
+    while len(added_edges) < edges:
+        node1 = random.randint(0, nodes - 1)
+        node2 = random.randint(0, nodes - 1)
+
+        # ensure no self-loops + no duplicate edges
+        if node1 != node2 and (node1, node2) not in added_edges and (node2, node1) not in added_edges:
+            weight = random.randint(1, 10)  # adjust weight range as needed
+            graph.add_edge(node1, node2, weight)
+            added_edges.add((node1, node2))
+
+    return graph
