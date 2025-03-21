@@ -182,7 +182,7 @@ def dijkstra(graph, source, k):
         #Adding each node and its distance to a list
         items.append(Item(dist[node], node))
 
-    #Creating a min heap from the list 
+    #Creating a min heap from the list of items 
     min_heap = Heap(items)
 
     #Initializing the source key distance to 0 and adding it to heap
@@ -190,7 +190,22 @@ def dijkstra(graph, source, k):
     min_heap.decrease_key(source, 0)
     
     while not min_heap.is_empty():
-        #find ndoe with min distance 
+        #extract ndoe with min distance 
+        current_item = min_heap.extract_min()
+        current_node = current_item.value
+        current_dist = current_item.key
+
+        #Skipping node if already relaxed k times 
+        if relax_count[current_node] >= k:
+            continue
+
+        for neighbour in graph[current_node]:
+            if relax_count[neighbour] >= k:
+                continue
+
+            #TO DO
+            new_dist = 0
+
         return 
 
 
