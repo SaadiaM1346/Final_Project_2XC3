@@ -164,52 +164,60 @@ class Queue:
         self.q = []
 
 def dijkstra(graph, source, k):
-
-    dist, path = {}, {}
-    relax_count = {}
-    items = []
-
-    #includes the shortest distance and path 
-    shortest_paths = {}
-
-    if source not in graph:
+    dist, path, shortest_paths, relax_count = {}, {}, {}, {}
+    
+    #Checking if source node exists in the graph
+    if source not in graph.adj:
         return {}
 
-    for node in graph: 
+    #Initializing all nodes distances to infinity and relaxation counter to 0
+    for node in graph.adj: 
         dist[node] = float('inf') 
         path[node] = []
         relax_count[node] = 0
-        #Adding each node and its distance to a list
-        items.append(Item(dist[node], node))
-
-    #Creating a min heap from the list of items 
-    min_heap = Heap(items)
-
-    #Initializing the source key distance to 0 and adding it to heap
-    dist[source] = 0
-    min_heap.decrease_key(source, 0)
     
+    dist[source] = 0
+
+    #Creating initial heap from the list of items
+    items = [Item(node, dist[node]) for node in graph.adj]
+    min_heap = Heap(items)
+    min_heap.decrease_key(source, 0)
+
     while not min_heap.is_empty():
-        #extract ndoe with min distance 
+        #Extracting the node with min distance 
         current_item = min_heap.extract_min()
         current_node = current_item.value
         current_dist = current_item.key
 
-        #Skipping node if already relaxed k times 
-        if relax_count[current_node] >= k:
+        #Skipping node if already relaxed k times or has dist == inf
+        if current_dist == float('inf') or relax_count[current_node] >= k:
             continue
 
-        for neighbour in graph[current_node]:
+        #Relaxing its neighbours 
+        for neighbour in graph.adj[current_node]:
             if relax_count[neighbour] >= k:
                 continue
 
-            #TO DO
-            new_dist = 0
+            #Calculating the new distance and updating if smaller 
+            new_dist = current_dist + graph.w(current_node, neighbour)
+            if new_dist < dist[neighbour]:
+                dist[neighbour] = new_dist
+                path[neighbour] = path[current_node] + [current_node]
 
-        return 
+                #Decreasing key of the neighbour if its in the heap
+                if neighbour in min_heap.map:
+                    min_heap.decrease_key(neighbour, new_dist)
 
+                #Increasing the neigbours relaxation count
+                relax_count[neighbour] += 1
+
+    #Adding the shortest distance and path for each node to one dictionary 
+    for node in graph.adj:
+        shortest_paths[node] = {'distance': dist[node], 'path': path[node]}
 
     return shortest_paths
+
+
 
 def bellman_ford(graph, source, k):
 
