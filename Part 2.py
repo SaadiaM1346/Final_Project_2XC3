@@ -217,11 +217,27 @@ def dijkstra(graph, source, k):
 
     return shortest_paths
 
-
-
+# Bellman ford algorithm with k 
+# Bellman ford algorithm with k
 def bellman_ford(graph, source, k):
+    result = {node: [float('inf'), []] for node in graph.adj}
+    result[source] = [0, [source]]
 
-    return
+    for _ in range(k):
+        updated = False
+        tmp_result = result.copy()
+
+        for (u, v), w in graph.weights.items():
+            if result[u][0] != float('inf') and result[u][0] + w < tmp_result[v][0]:
+                tmp_result[v] = [result[u][0] + w, result[u][1] + [v]]
+                updated = True
+
+        result = tmp_result
+
+        if not updated:
+            break
+
+    return result
 
 def part2_experiment():
     return
