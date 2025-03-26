@@ -290,9 +290,9 @@ def create_random_graph(nodes, edges, neg = False):
     return graph
 
 # test random graph for bellman
-# print(create_random_graph_bellman(10,9, True)) 
-#test for dijkstra
-# print(create_random_graph_bellman(10,9)) 
+# print(create_random_graph(10,9, True)) 
+# test for dijkstra
+# print(create_random_graph(10,9)) 
 
 def part2_experiment():
     return
