@@ -5,6 +5,24 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
+#Helper function to plot experiment results 
+def draw_plot(run_arr, mean, title):
+    x = np.arange(0, len(run_arr),1)
+    fig=plt.figure(figsize=(20,8))
+    plt.axhline(mean, color="red", linestyle="--", label=f"Avg = {mean:.3f} (µs)")
+    plt.bar(x, run_arr, color="purple", alpha=0.6, label="percentage")
+
+    # Set y-axis range so lower bound is 10% lower and higher is 10% higher
+    max_y = max(run_arr)  
+    min_y = min(run_arr)  
+    plt.ylim(min_y * 0.9, max_y * 1.1)  
+
+    plt.xlabel(f"Number of trials")
+    plt.ylabel("Time taken in microseconds")
+    plt.title(title)
+    plt.legend()
+    plt.show()
+
 # Directed Weighted Graph
 class Graph:
 
@@ -294,6 +312,23 @@ def create_random_graph(nodes, edges, neg = False):
 # test for dijkstra
 # print(create_random_graph(10,9)) 
 
-def part2_experiment():
+def part2_experiment(num_nodes, num_edges, k, trials):
+
+    #Testing graph densities 
+    #Testing varying k values 
+
+    dijk_times, bell_times = [], []
+
+
+
+    #calculating average times for both algorithms
+    avg_dijk = sum(dijk_times) / trials
+    avg_bell = sum(bell_times) / trials
+
+    draw_plot(dijk_times, avg_dijk, "Dijkstra's Algorithm")
+    draw_plot(bell_times, avg_bell, "Bellmand Ford's Algorithm")
+
+
+    
     return
 
