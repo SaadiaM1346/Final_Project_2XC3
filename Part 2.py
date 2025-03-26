@@ -53,6 +53,19 @@ class Graph:
 
     def number_of_nodes(self):
         return len(self.adj)
+
+    def has_neg_cycle(self, nodes, src):
+        dist = {node: float('inf') for node in self.adj}
+        dist[src] = 0  
+        
+        for i in range(nodes):  
+            for (u, v), w in self.weights.items():
+                if dist[u] != float('inf') and dist[u] + w < dist[v]:
+                    if i == nodes -1:
+                        return True
+                    dist[v] = dist[u] + w
+        
+        return False
     
     def __str__(self):
         graph_str = ""
@@ -242,6 +255,7 @@ def dijkstra(graph, source, k):
     return shortest_paths
 
 # Bellman ford algorithm with k
+# does not check for negative cycles
 def bellman_ford(graph, source, k):
     result = {node: [float('inf'), []] for node in graph.adj}
     result[source] = [0, [source]]
@@ -262,7 +276,7 @@ def bellman_ford(graph, source, k):
 
     return result
 
-def create_random_graph(nodes, edges, neg = False):
+def create_random_graph(nodes, edges, src, neg = False):
     graph = Graph()
 
     for node in range(nodes):
@@ -273,10 +287,7 @@ def create_random_graph(nodes, edges, neg = False):
     # Ensure node 0 is connected to a random node
     if nodes > 1:  # Ensure there are other nodes to connect to
         node2 = random.randint(1, nodes - 1)  # Pick a random node from 1 to nodes-1
-        if neg:
-            weight = random.randint(-10, 10)
-        else:
-            weight = random.randint(1, 10)
+        weight = random.randint(-10, 10) if neg else random.randint(1, 10)
         graph.add_edge(0, node2, weight)
         added_edges.add((0, node2))
 
@@ -284,10 +295,7 @@ def create_random_graph(nodes, edges, neg = False):
     for i in range(1, nodes):
         node1 = i
         node2 = random.randint(0, i - 1)  # connect node to any previously added node
-        if neg:
-            weight = random.randint(-10, 10)
-        else:
-            weight = random.randint(1, 10)
+        weight = random.randint(-10, 10) if neg else random.randint(1, 10)
         graph.add_edge(node1, node2, weight)
         added_edges.add((node1, node2))
 
@@ -298,12 +306,13 @@ def create_random_graph(nodes, edges, neg = False):
 
         # ensure no self-loops + no duplicate edges
         if node1 != node2 and (node1, node2) not in added_edges:
-            if neg:
-                weight = random.randint(-10, 10)
-            else:
-                weight = random.randint(1, 10)
+            weight = random.randint(-10, 10) if neg else random.randint(1, 10)
             graph.add_edge(node1, node2, weight)
-            added_edges.add((node1, node2))
+
+            if graph.has_neg_cycle(nodes, src):
+                graph.adj[node1].remove(node2)
+            else:
+                added_edges.add((node1, node2))
 
     return graph
 
@@ -312,13 +321,14 @@ def create_random_graph(nodes, edges, neg = False):
 # test for dijkstra
 # print(create_random_graph(10,9)) 
 
+
+
 def part2_experiment(num_nodes, num_edges, k, trials):
 
     #Testing graph densities 
     #Testing varying k values 
 
     dijk_times, bell_times = [], []
-
 
 
     #calculating average times for both algorithms
