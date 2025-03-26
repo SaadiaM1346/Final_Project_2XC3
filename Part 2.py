@@ -6,19 +6,27 @@ import numpy as np
 import math
 
 #Helper function to plot experiment results 
-def draw_plot(run_arr, mean, title):
-    x = np.arange(0, len(run_arr),1)
-    fig=plt.figure(figsize=(20,8))
-    plt.axhline(mean, color="red", linestyle="--", label=f"Avg = {mean:.3f} (µs)")
-    plt.bar(x, run_arr, color="purple", alpha=0.6, label="percentage")
+def draw_plot(run_arr_dijkstra, run_arr_bellman, mean_dijkstra, mean_bellman, title):
+    x = np.arange(len(run_arr_dijkstra))  # X-axis values based on number of trials
 
-    # Set y-axis range so lower bound is 10% lower and higher is 10% higher
-    max_y = max(run_arr)  
-    min_y = min(run_arr)  
+    fig = plt.figure(figsize=(20, 8))
+
+    # Plot bars side by side
+    width = 0.4  # Width of the bars
+    plt.bar(x - width/2, run_arr_dijkstra, width=width, color="blue", alpha=0.6, label="Dijkstra’s")
+    plt.bar(x + width/2, run_arr_bellman, width=width, color="green", alpha=0.6, label="Bellman-Ford")
+
+    # Add horizontal lines for mean
+    plt.axhline(mean_dijkstra, color="blue", linestyle="--", label=f"Dijkstra’s Avg = {mean_dijkstra:.3f} µs")
+    plt.axhline(mean_bellman, color="green", linestyle="--", label=f"Bellman-Ford Avg = {mean_bellman:.3f} µs")
+
+    # Adjust y-axis limits
+    max_y = max(max(run_arr_dijkstra), max(run_arr_bellman))
+    min_y = min(min(run_arr_dijkstra), min(run_arr_bellman))
     plt.ylim(min_y * 0.9, max_y * 1.1)  
 
-    plt.xlabel(f"Number of trials")
-    plt.ylabel("Time taken in microseconds")
+    plt.xlabel("Number of Trials")
+    plt.ylabel("Time taken (microseconds)")
     plt.title(title)
     plt.legend()
     plt.show()
@@ -323,22 +331,62 @@ def create_random_graph(nodes, edges, src, neg = False):
 
 
 
-def part2_experiment(num_nodes, num_edges, k, trials):
-
-    #Testing graph densities 
-    #Testing varying k values 
+def part2_experiment(node_vals, edge_vals, k_vals, title):
+    trials = 40
 
     dijk_times, bell_times = [], []
 
+    for n, e, k in zip(node_vals, edge_vals, k_vals):
+        dijk_trial_times = []
+        bell_trial_times = []
 
-    #calculating average times for both algorithms
-    avg_dijk = sum(dijk_times) / trials
-    avg_bell = sum(bell_times) / trials
+        for _ in range(trials):
+            #generate graphs (for dijk and bell)
+            #pick source node 
 
-    draw_plot(dijk_times, avg_dijk, "Dijkstra's Algorithm")
-    draw_plot(bell_times, avg_bell, "Bellmand Ford's Algorithm")
+            start = time.time()
+            dijkstra(graph, src, k)
+            dijk_trial_times.append((time.time() - start) * 1e6)  # Convert to microseconds
+
+            start = time.time()
+            bellman_ford(graph, source, k)
+            bell_trial_times.append((time.time() - start) * 1e6) 
+
+        dijk_times.append(np.mean(dijk_trial_times))
+        bell_times.append(np.mean(bell_trial_times))
+        
+        
+
+        #Graph plots both graphs simultanously (in diff colours ) -> idk what values we should have in the legend or have one at all 
+        draw_plot(dijk_times, bell_times, avg_dijk,avg_bell, f"Dijkstra's Vs Bellman Ford's Algorithms to test {title}")
+
 
 
     
     return
+
+
+#Size vs density
+part2_experiment([5, 10, 50, 100, 150], [5, 10, 50, 100, 150],  [ 6, 10, 50, 100, 150] , "Size vs Density" ) #density N sparse
+part2_experiment([5, 10, 50, 100, 150], [15, 45, 1225, 4950, 11175 ],  [ 6, 10, 50, 100, 150] , "Size vs Density" ) #density medium
+part2_experiment([5, 10, 50, 100, 150], [30, 90, 2450, 9900, 22,350 ],  [ 6, 10, 50, 100, 150] , "Size vs Density" ) #density (N(N-1)) dense
+
+#K vs density
+part2_experiment( [ 20, 20, 20], [20, 190, 380], [5]*3, "K value vs Density" ) #k = 5
+part2_experiment( [ 20, 20, 20], [20, 190, 380], [10]*3, "K value vs Density" ) #k = 10
+part2_experiment( [ 20, 20, 20], [20, 190, 380], [15]*3, "K value vs Density" ) #k = 15
+part2_experiment( [ 20, 20, 20], [20, 190, 380], [15]*3, "K value vs Density" ) #k = 20
+
+
+#K vs Size
+part2_experiment( [ 5, 10, 20, 50, 100] , [10, 45, 190, 1225, 4950 ], [5]*5, "K value vs Size" ) #k = 5
+part2_experiment( [ 5, 10, 20, 50, 100] , [10, 45, 190, 1225, 4950 ], [10]*5, "K value vs Size" ) #k = 10
+part2_experiment( [ 5, 10, 20, 50, 100] , [10, 45, 190, 1225, 4950 ], [15]*5, "K value vs Size"  ) #k = 15
+part2_experiment( [ 5, 10, 20, 50, 100] , [10, 45, 190, 1225, 4950 ], [20]*5, "K value vs Size"  ) #k = 20
+
+
+
+
+
+
 
