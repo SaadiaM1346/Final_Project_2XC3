@@ -182,6 +182,7 @@ def dijkstra(graph, source, k):
         relax_count[node] = 0
     
     dist[source] = 0
+    path[source] = [source]
 
     #Creating initial heap from the list of items
     items = [Item(node, dist[node]) for node in graph.adj]
@@ -207,7 +208,7 @@ def dijkstra(graph, source, k):
             new_dist = current_dist + graph.w(current_node, neighbour)
             if new_dist < dist[neighbour]:
                 dist[neighbour] = new_dist
-                path[neighbour] = path[current_node] + [current_node]
+                path[neighbour] = path[current_node] + [neighbour]
 
                 #Decreasing key of the neighbour if its in the heap
                 if neighbour in min_heap.map:
@@ -218,7 +219,7 @@ def dijkstra(graph, source, k):
 
     #Adding the shortest distance and path for each node to one dictionary 
     for node in graph.adj:
-        shortest_paths[node] = {'distance': dist[node], 'path': path[node]}
+        shortest_paths[node] = [ dist[node], path[node] ]
 
     return shortest_paths
 
