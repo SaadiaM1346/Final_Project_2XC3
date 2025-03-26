@@ -35,6 +35,15 @@ class Graph:
 
     def number_of_nodes(self):
         return len(self.adj)
+    
+    def __str__(self):
+        graph_str = ""
+        for node in self.adj:
+            graph_str += f"Node {node}: "
+            for neighbor in self.adj[node]:
+                graph_str += f"({neighbor}, weight: {self.weights[(node, neighbor)]}) "
+            graph_str += "\n"
+        return graph_str
 
 # Helper Class for Heap
 class Item:
@@ -159,10 +168,6 @@ class Heap:
             whitespace = whitespace // 2
         return s
 
-class Queue:
-    def __init__(self):
-        self.q = []
-
 def dijkstra(graph, source, k):
     dist, path, shortest_paths, relax_count = {}, {}, {}, {}
     
@@ -217,7 +222,6 @@ def dijkstra(graph, source, k):
 
     return shortest_paths
 
-# Bellman ford algorithm with k 
 # Bellman ford algorithm with k
 def bellman_ford(graph, source, k):
     result = {node: [float('inf'), []] for node in graph.adj}
@@ -238,6 +242,56 @@ def bellman_ford(graph, source, k):
             break
 
     return result
+
+def create_random_graph(nodes, edges, neg = False):
+    graph = Graph()
+
+    for node in range(nodes):
+        graph.add_node(node)
+
+    added_edges = set()
+
+    # Ensure node 0 is connected to a random node
+    if nodes > 1:  # Ensure there are other nodes to connect to
+        node2 = random.randint(1, nodes - 1)  # Pick a random node from 1 to nodes-1
+        if neg:
+            weight = random.randint(-10, 10)
+        else:
+            weight = random.randint(1, 10)
+        graph.add_edge(0, node2, weight)
+        added_edges.add((0, node2))
+
+    # create a spanning tree
+    for i in range(1, nodes):
+        node1 = i
+        node2 = random.randint(0, i - 1)  # connect node to any previously added node
+        if neg:
+            weight = random.randint(-10, 10)
+        else:
+            weight = random.randint(1, 10)
+        graph.add_edge(node1, node2, weight)
+        added_edges.add((node1, node2))
+
+    # add any random edges
+    while len(added_edges) < edges:
+        node1 = random.randint(0, nodes - 1)
+        node2 = random.randint(0, nodes - 1)
+
+        # ensure no self-loops + no duplicate edges
+        if node1 != node2 and (node1, node2) not in added_edges:
+            if neg:
+                weight = random.randint(-10, 10)
+            else:
+                weight = random.randint(1, 10)
+            graph.add_edge(node1, node2, weight)
+            added_edges.add((node1, node2))
+
+    return graph
+
+# test random graph for bellman
+# print(create_random_graph_bellman(10,9, True)) 
+#test for dijkstra
+# print(create_random_graph_bellman(10,9)) 
 
 def part2_experiment():
     return
