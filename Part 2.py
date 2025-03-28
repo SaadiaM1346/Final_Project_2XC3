@@ -6,7 +6,7 @@ import numpy as np
 import math
 
 #Helper function to plot experiment results 
-def draw_plot(run_arr_dijkstra, run_arr_bellman, mean_dijkstra, mean_bellman, title):
+def draw_plot(run_arr_dijkstra, run_arr_bellman, title):
     x = np.arange(len(run_arr_dijkstra))  # X-axis values based on number of trials
 
     fig = plt.figure(figsize=(20, 8))
@@ -15,10 +15,6 @@ def draw_plot(run_arr_dijkstra, run_arr_bellman, mean_dijkstra, mean_bellman, ti
     width = 0.4  # Width of the bars
     plt.bar(x - width/2, run_arr_dijkstra, width=width, color="blue", alpha=0.6, label="Dijkstra’s")
     plt.bar(x + width/2, run_arr_bellman, width=width, color="green", alpha=0.6, label="Bellman-Ford")
-
-    # Add horizontal lines for mean
-    plt.axhline(mean_dijkstra, color="blue", linestyle="--", label=f"Dijkstra’s Avg = {mean_dijkstra:.3f} µs")
-    plt.axhline(mean_bellman, color="green", linestyle="--", label=f"Bellman-Ford Avg = {mean_bellman:.3f} µs")
 
     # Adjust y-axis limits
     max_y = max(max(run_arr_dijkstra), max(run_arr_bellman))
@@ -341,24 +337,27 @@ def part2_experiment(node_vals, edge_vals, k_vals, title):
         bell_trial_times = []
 
         for _ in range(trials):
-            #generate graphs (for dijk and bell)
-            #pick source node 
+
+            #Pick source node
+            src = np.random.randint(0, n)  
+
+            # Generate graphs 
+            dijk_graph = create_random_graph(n, e, src, neg=False)
+            bell_graph = create_random_graph(n, e, src, neg=True)
 
             start = time.time()
-            dijkstra(graph, src, k)
+            dijkstra(dijk_graph, src, k)
             dijk_trial_times.append((time.time() - start) * 1e6)  # Convert to microseconds
 
             start = time.time()
-            bellman_ford(graph, source, k)
+            bellman_ford(bell_graph, src, k)
             bell_trial_times.append((time.time() - start) * 1e6) 
 
         dijk_times.append(np.mean(dijk_trial_times))
         bell_times.append(np.mean(bell_trial_times))
-        
-        
 
         #Graph plots both graphs simultanously (in diff colours ) -> idk what values we should have in the legend or have one at all 
-        draw_plot(dijk_times, bell_times, avg_dijk,avg_bell, f"Dijkstra's Vs Bellman Ford's Algorithms to test {title}")
+        draw_plot(dijk_times, bell_times, f"Dijkstra's Vs Bellman Ford's Algorithms to test {title}")
 
 
 
